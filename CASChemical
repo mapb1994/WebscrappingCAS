@@ -1,0 +1,32 @@
+import requests 
+from lxml import html
+
+
+def get_data(url_total):
+    resp = requests.get(url=url_total, headers ={ 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.87 Safari/537.36' })
+    tree = html.fromstring(html=resp.content)
+    tr_elements = tree.xpath('//tr')
+    total = 0
+    col=[]
+    for t in tr_elements:
+        total+=1
+        name=t.text_content().strip()
+        print ('%d:"%s"'%(total,name))
+        col.append((name,[]))
+
+
+def main():
+    url="https://www.chemicalbook.com" 
+    resto_url = "/ProductCASList_12_0_EN.htm"
+    resp = requests.get(url=url+resto_url, headers ={ 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.87 Safari/537.36' })
+    tree = html.fromstring(html=resp.content)
+    proximos = tree.xpath("//*[@id='form1']/div[2]/div[9]//a/@href")
+    get_data(url+resto_url)
+    for p in proximos:
+        url_total = url+p
+        #print(url_total)
+        get_data(url_total)
+
+
+if __name__ == '__main__':
+    main()
